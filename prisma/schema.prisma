@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Person {
+  id       String    @id @unique @default(uuid())
+  name     String
+  idNumber String   @unique
+  email    String
+  phone    String
+  adress  String
+  Account  Account[]
+}
+
+model Account {
+  id                   String        @id @unique @default(uuid())
+  accountNumber        String        @unique
+  balance              Float
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  person               Person        @relation(fields: [personId], references: [id])
+  personId             String
+  transactions         Transaction[]
+  transfersOrigin      Transfer[]    @relation("originAccount")
+  transfersDestination Transfer[]    @relation("destinationAccount")
+  User                 User?
+}
+
+model User {
+  id            String  @id @unique @default(uuid())
+  account       Account @relation(fields: [accountNumber], references: [accountNumber])
+  accountNumber String  @unique
+  password      String
+}
+
+model Transaction {
+  id            String   @id @unique @default(uuid())
+  amount        Float
+  type          String
+  createdAt     DateTime @default(now())
+  account       Account  @relation(fields: [accountNumber], references: [accountNumber])
+  accountNumber String
+}
+
+model Transfer {
+  id                   String   @id @unique @default(uuid())
+  amount               Float
+  createdAt            DateTime @default(now())
+  originAccountId      Account  @relation(fields: [originAccount], references: [accountNumber], name: "originAccount")
+  originAccount        String
+  destinationAccountId Account  @relation(fields: [destinationAccount], references: [accountNumber], name: "destinationAccount")
+  destinationAccount   String
+}
