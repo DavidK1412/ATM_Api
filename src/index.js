@@ -1,4 +1,5 @@
 import  express  from "express";
+import cors from 'cors';
 
 import accountRoutes from './routes/account.routes.js';
 import personRoutes from './routes/person.routes.js';
@@ -9,6 +10,7 @@ import userRoutes from './routes/user.routes.js';
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/person', personRoutes);
 app.use('/api/user', userRoutes);
